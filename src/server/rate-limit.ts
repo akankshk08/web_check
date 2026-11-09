@@ -27,3 +27,8 @@ export const RATE_LIMITS = {
   upload: { limit: 60, window: 10 * 60 },
   ticket: { limit: 10, window: 60 * 60 },
 } as const;
+
+/** Removes expired counters (called by the daily cron job). */
+export async function pruneRateLimits(db: DbOrTx) {
+  await db.execute(sql`delete from rate_limits where window_start < now() - interval '1 day'`);
+}

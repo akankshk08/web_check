@@ -192,3 +192,15 @@ describe("Notifications and rate limiting", () => {
     await expect(enforceRateLimit(db, key, 3, 60)).rejects.toBeInstanceOf(RateLimitError);
   });
 });
+
+describe("Support tickets", () => {
+  it("clients can only open tickets on their own projects; only managers can respond", async () => {
+    const { createTicket, updateTicket, listTickets } = await import("@/server/services/support");
+    await expect(createTicket(db, A.clientACtx, { subject: "x", description: "y", projectId: A.projectB.id, priority: "LOW" })).rejects.toBeInstanceOf(NotFoundError);
+    const t = await createTicket(db, A.clientACtx, { subject: "Site down", description: "Help", projectId: A.projectA.id, priority: "HIGH" });
+    expect((await listTickets(db, A.clientBCtx)).map((x) => x.id)).not.toContain(t.id);
+    await expect(updateTicket(db, A.employeeCtx, { id: t.id, status: "RESOLVED", staffResponse: "" })).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(updateTicket(db, B.ownerCtx, { id: t.id, status: "RESOLVED", staffResponse: "" })).rejects.toBeInstanceOf(NotFoundError);
+    await updateTicket(db, A.adminCtx, { id: t.id, status: "RESOLVED", staffResponse: "Fixed" });
+  });
+});

@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Logo } from "@/components/shared/logo";
 import { cn } from "@/lib/utils";
 import type { NavIcon, NavSection } from "./nav-config";
@@ -88,8 +88,6 @@ function NavLinks({ sections, onNavigate }: { sections: NavSection[]; onNavigate
 
 export function Sidebar({ sections, orgName, homeHref }: { sections: NavSection[]; orgName: string; homeHref: string }) {
   const [open, setOpen] = useState(false);
-  const pathname = usePathname();
-  useEffect(() => setOpen(false), [pathname]);
 
   const content = (
     <div className="flex h-full flex-col">

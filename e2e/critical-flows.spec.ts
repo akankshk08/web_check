@@ -136,6 +136,19 @@ test("milestone review: owner submits, client approves from the portal", async (
   await page.reload();
   await expect(page.locator("text=Approved").first()).toBeVisible();
   await client.context.close();
+
+  // pages listing invitations and portal users render (regression check)
+  await page.goto("/app/team");
+  await page.getByRole("button", { name: "Invite member" }).click();
+  await page.fill("#email", unique("pending"));
+  await page.getByRole("button", { name: "Send invitation" }).click();
+  await toast(page, "Invitation sent.");
+  await page.reload();
+  await expect(page.getByText("Pending invitations")).toBeVisible();
+  await page.goto("/app/clients");
+  await page.getByRole("link", { name: "Acme Bakery" }).click();
+  await expect(page.getByText("Casey Client").first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "Remove" })).toBeVisible();
 });
 
 test("invoice totals, sending, payment and PDF", async ({ page, browser }) => {

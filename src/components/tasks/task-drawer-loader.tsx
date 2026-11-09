@@ -14,6 +14,7 @@ import { TaskDrawer } from "./task-drawer";
 export async function TaskDrawerLoader({ ctx, taskId }: { ctx: AuthContext; taskId: string | undefined }) {
   if (!taskId || !z.uuid().safeParse(taskId).success) return null;
   const db = getDb();
+  let data;
   try {
     const detail = await getTaskDetail(db, ctx, taskId);
     const [files, milestones, staff] = await Promise.all([
@@ -21,7 +22,13 @@ export async function TaskDrawerLoader({ ctx, taskId }: { ctx: AuthContext; task
       listMilestoneOptions(db, ctx, detail.task.projectId),
       isManager(ctx) ? listStaffOptions(db, ctx) : Promise.resolve([]),
     ]);
-    return (
+    data = { detail, files, milestones, staff };
+  } catch (err) {
+    if (err instanceof NotFoundError) return null;
+    throw err;
+  }
+  const { detail, files, milestones, staff } = data;
+  return (
       <TaskDrawer
         detail={detail}
         files={files.map((f) => ({ ...f, canDelete: isManager(ctx) || f.uploadedById === ctx.userId }))}
@@ -30,9 +37,5 @@ export async function TaskDrawerLoader({ ctx, taskId }: { ctx: AuthContext; task
         isManager={isManager(ctx)}
         bucket={serverEnv().SUPABASE_STORAGE_BUCKET}
       />
-    );
-  } catch (err) {
-    if (err instanceof NotFoundError) return null;
-    throw err;
-  }
+  );
 }

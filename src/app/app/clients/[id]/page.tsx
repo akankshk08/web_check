@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { FolderKanban, LifeBuoy, Receipt, UserRound } from "lucide-react";
 import { ArchiveClientButton, EditClientButton, InviteClientUserForm } from "@/components/clients/client-actions";
-import { ConfirmButton } from "@/components/shared/confirm-button";
+import { RemovePortalUserButton, RevokeInvitationButton } from "@/components/shared/membership-buttons";
 import { DetailList, EmptyState, PageHeader } from "@/components/shared/page";
 import { PriorityBadge, StatusBadge } from "@/components/shared/status-badge";
 import { RespondToTicket } from "@/components/support/ticket-respond";
@@ -12,7 +12,6 @@ import { Progress } from "@/components/ui/misc";
 import { getDb } from "@/db";
 import { formatDate, timeAgo } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
-import { removeClientUserAction, revokeInvitationAction } from "@/server/actions/clients";
 import { requireManagerPage } from "@/server/auth/session";
 import { orNotFound } from "@/server/page";
 import { getClient } from "@/server/services/clients";
@@ -180,17 +179,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                         {u.status !== "ACTIVE" ? " · removed" : ""}
                       </p>
                     </div>
-                    <ConfirmButton
-                      size="sm"
-                      variant="ghost"
-                      action={() => removeClientUserAction({ id: u.id })}
-                      title="Remove portal access?"
-                      description={`${u.fullName} will no longer be able to sign in to this client’s portal.`}
-                      confirmLabel="Remove"
-                      success="Access removed."
-                    >
-                      Remove
-                    </ConfirmButton>
+                    <RemovePortalUserButton id={u.id} name={u.fullName} />
                   </li>
                 ))}
               </ul>
@@ -205,17 +194,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     <li key={i.id} className="flex items-center gap-2 text-[13px]">
                       <span className="min-w-0 flex-1 truncate">{i.email}</span>
                       <span className="text-xs text-muted">expires {formatDate(i.expiresAt)}</span>
-                      <ConfirmButton
-                        size="sm"
-                        variant="ghost"
-                        action={() => revokeInvitationAction({ id: i.id })}
-                        title="Cancel invitation?"
-                        description="The invitation link will stop working."
-                        confirmLabel="Cancel invitation"
-                        success="Invitation cancelled."
-                      >
-                        Revoke
-                      </ConfirmButton>
+                      <RevokeInvitationButton id={i.id} email={i.email} />
                     </li>
                   ))}
                 </ul>

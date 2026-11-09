@@ -7,7 +7,7 @@ import { nn } from "@/lib/validations/common";
 import type { projectSchema } from "@/lib/validations/entities";
 import { assertManager, assertStaff, isManager } from "@/server/auth/permissions";
 import type { AuthContext } from "@/server/auth/types";
-import { BadRequestError, NotFoundError } from "@/server/errors";
+import { BadRequestError } from "@/server/errors";
 import { getAccessibleProject } from "./access";
 import { logActivity } from "./activity";
 import { likePattern } from "./clients";

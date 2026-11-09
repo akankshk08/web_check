@@ -40,7 +40,8 @@ export function AppHeader({
   };
   const signOut = async () => {
     await fetch("/auth/signout", { method: "POST" });
-    window.location.href = "/login";
+    router.replace("/login");
+    router.refresh();
   };
 
   return (

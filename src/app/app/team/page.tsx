@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Users } from "lucide-react";
-import { ConfirmButton } from "@/components/shared/confirm-button";
+import { RevokeInvitationButton } from "@/components/shared/membership-buttons";
 import { EmptyState, PageHeader } from "@/components/shared/page";
 import { InviteMemberDialog, MemberMenu } from "@/components/team/team-actions";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,6 @@ import { Table, TBody, TD, TH, THead, TR } from "@/components/ui/table";
 import { getDb } from "@/db";
 import { formatDate } from "@/lib/dates";
 import { humanize } from "@/lib/utils";
-import { revokeInvitationAction } from "@/server/actions/clients";
 import { isManager, isOwner } from "@/server/auth/permissions";
 import { requireStaffPage } from "@/server/auth/session";
 import { listPendingInvitations } from "@/server/services/invitations";
@@ -97,17 +96,7 @@ export default async function TeamPage() {
                 <span className="min-w-0 flex-1 truncate font-medium">{i.email}</span>
                 <Badge>{humanize(i.role)}</Badge>
                 <span className="hidden text-xs text-muted sm:inline">expires {formatDate(i.expiresAt)}</span>
-                <ConfirmButton
-                  size="sm"
-                  variant="ghost"
-                  action={() => revokeInvitationAction({ id: i.id })}
-                  title="Cancel invitation?"
-                  description={`The invitation link sent to ${i.email} will stop working.`}
-                  confirmLabel="Cancel invitation"
-                  success="Invitation cancelled."
-                >
-                  Revoke
-                </ConfirmButton>
+                <RevokeInvitationButton id={i.id} email={i.email} />
               </li>
             ))}
           </ul>

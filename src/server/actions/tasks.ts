@@ -43,11 +43,6 @@ export const addTaskCommentAction = authedAction(taskCommentSchema, async (input
   return null;
 });
 
-/** Task detail for the side panel (permission-checked). */
-export const getTaskDetailAction = authedAction(z.object({ id: z.uuid() }).strict(), async (input, ctx) => {
-  return getTaskDetail(getDb(), ctx, input.id);
-});
-
 export const logTimeAction = authedAction(timeEntrySchema, async (input, ctx) => {
   await logTime(getDb(), ctx, input);
   revalidatePath("/app/my-work/timesheets");

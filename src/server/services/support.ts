@@ -5,7 +5,7 @@ import { clients, projects, supportTickets, users } from "@/db/schema";
 import type { TicketStatus } from "@/db/schema/enums";
 import { nn } from "@/lib/validations/common";
 import type { ticketSchema, ticketUpdateSchema } from "@/lib/validations/entities";
-import { assertClient, assertStaff, isClient } from "@/server/auth/permissions";
+import { assertClient, assertManager, assertStaff, isClient } from "@/server/auth/permissions";
 import type { AuthContext } from "@/server/auth/types";
 import { BadRequestError, NotFoundError } from "@/server/errors";
 import { getAccessibleProject } from "./access";
@@ -96,7 +96,7 @@ export async function listTickets(db: DbOrTx, ctx: AuthContext, { status, client
 }
 
 export async function updateTicket(db: Database, ctx: AuthContext, input: z.infer<typeof ticketUpdateSchema>) {
-  assertStaff(ctx);
+  assertManager(ctx);
   const [ticket] = await db
     .select()
     .from(supportTickets)

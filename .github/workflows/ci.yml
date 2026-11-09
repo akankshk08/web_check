@@ -1,0 +1,71 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_PASSWORD: postgres, POSTGRES_DB: agencyos_test }
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/agencyos_test
+      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/agencyos_test
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key-0000
+      SUPABASE_SERVICE_ROLE_KEY: ci-placeholder-service-key-0000
+      CRON_SECRET: ci-cron-secret-0123456789-0123456789
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run db:migrate
+      - run: npm test
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: checks
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_PASSWORD: postgres, POSTGRES_DB: agencyos }
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/agencyos
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+      SUPABASE_STORAGE_BUCKET: attachments
+      CRON_SECRET: ci-cron-secret-0123456789-0123456789
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Start local Supabase Auth + gateway (dev/test only)
+        run: |
+          DB=agencyos scripts/local-supabase/start.sh | tee keys.env
+          cat keys.env | grep '^NEXT_PUBLIC_SUPABASE_ANON_KEY=\|^SUPABASE_SERVICE_ROLE_KEY=' >> "$GITHUB_ENV"
+          nohup node scripts/local-supabase/gateway.mjs > gateway.log 2>&1 &
+      - run: npm run db:migrate
+      - run: npm run build
+      - run: nohup npm start > next.log 2>&1 &
+      - run: npx playwright install --with-deps chromium
+      - run: npx wait-on -t 60000 http://localhost:3000/api/health
+      - run: npx playwright test --trace off
+      - if: failure()
+        run: tail -100 next.log gateway.log

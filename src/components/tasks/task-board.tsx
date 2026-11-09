@@ -1,7 +1,7 @@
 "use client";
 import { CalendarDays, ListTree } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { PriorityBadge, StatusBadge } from "@/components/shared/status-badge";
 import { Avatar } from "@/components/ui/misc";
@@ -45,7 +45,12 @@ function useOpenTask() {
 function useStatusChange(initial: BoardTask[]) {
   const router = useRouter();
   const [tasks, setTasks] = useState(initial);
-  useEffect(() => setTasks(initial), [initial]);
+  // Re-sync when the server sends fresh data (after router.refresh()).
+  const [source, setSource] = useState(initial);
+  if (source !== initial) {
+    setSource(initial);
+    setTasks(initial);
+  }
   const change = async (task: BoardTask, status: TaskStatus) => {
     if (task.status === status) return;
     const position = Math.max(0, ...tasks.filter((t) => t.status === status).map((t) => t.position)) + 1;
