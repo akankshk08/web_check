@@ -167,7 +167,7 @@ test("invoice totals, sending, payment and PDF", async ({ page, browser }) => {
   await page.getByRole("button", { name: "Create draft invoice" }).click();
   await toast(page, "Invoice created as a draft.");
   await page.waitForURL(/\/app\/invoices\/[0-9a-f-]{36}$/);
-  await expect(page.getByText("INV-0001")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Invoice INV-0001" })).toBeVisible();
   await expect(page.getByText("$1,215.38").first()).toBeVisible(); // server-calculated total
 
   // client cannot see drafts
@@ -190,7 +190,7 @@ test("invoice totals, sending, payment and PDF", async ({ page, browser }) => {
   const client = await newSession(browser);
   await login(client.page, clientEmail);
   await client.page.goto("/portal/invoices");
-  await expect(client.page.getByText("INV-0001")).toBeVisible();
+  await expect(client.page.getByRole("link", { name: "INV-0001", exact: true })).toBeVisible();
   await client.context.close();
 });
 
