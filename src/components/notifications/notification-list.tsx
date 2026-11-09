@@ -1,4 +1,5 @@
 "use client";
+import { LocalTime } from "@/components/shared/local-time";
 import { Bell, CheckCheck } from "lucide-react";
 import Link from "next/link";
 import { useAction } from "@/components/shared/form";
@@ -35,7 +36,7 @@ export function NotificationList({ rows }: { rows: Row[] }) {
                 <span className="min-w-0 flex-1">
                   <span className={cn("block text-[13px]", !n.readAt && "font-semibold")}>{n.title}</span>
                   {n.body && <span className="block truncate text-xs text-muted">{n.body}</span>}
-                  <span className="block text-xs text-muted">{new Date(n.createdAt).toLocaleString()}</span>
+                  <span className="block text-xs text-muted"><LocalTime value={n.createdAt} /></span>
                 </span>
                 {!n.readAt && <span className="sr-only">Unread</span>}
               </>

@@ -1,3 +1,4 @@
+import { LocalTime } from "@/components/shared/local-time";
 import { CheckCircle2, MessageSquare, RotateCcw, Send } from "lucide-react";
 
 const ICON = { SUBMITTED: Send, APPROVED: CheckCircle2, CHANGES_REQUESTED: RotateCcw, FEEDBACK: MessageSquare } as const;
@@ -21,7 +22,7 @@ export function MilestoneHistory({
               <span className="font-medium">{LABEL[h.action]}</span>
               <span className="text-muted">
                 {" "}
-                · {h.actorName ?? "Former member"} · {new Date(h.createdAt).toLocaleString()}
+                · {h.actorName ?? "Former member"} · <LocalTime value={h.createdAt} />
               </span>
             </p>
             {h.comment && <p className="mt-0.5 text-[13px] whitespace-pre-wrap text-muted">“{h.comment}”</p>}

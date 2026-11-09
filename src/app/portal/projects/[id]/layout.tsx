@@ -38,3 +38,5 @@ export default async function PortalProjectLayout({ children, params }: { childr
     </>
   );
 }
+
+export const metadata = { title: "Project" };

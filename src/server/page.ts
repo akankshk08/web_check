@@ -1,13 +1,13 @@
 import "server-only";
 import { notFound } from "next/navigation";
-import { ForbiddenError, NotFoundError } from "@/server/errors";
+import { ForbiddenError, isInvalidIdError, NotFoundError } from "@/server/errors";
 
 /** Turns service "not found"/"forbidden" into the 404 page for server-rendered pages. */
 export async function orNotFound<T>(promise: Promise<T>): Promise<T> {
   try {
     return await promise;
   } catch (err) {
-    if (err instanceof NotFoundError || err instanceof ForbiddenError) notFound();
+    if (err instanceof NotFoundError || err instanceof ForbiddenError || isInvalidIdError(err)) notFound();
     throw err;
   }
 }

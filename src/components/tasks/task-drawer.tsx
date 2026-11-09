@@ -1,4 +1,5 @@
 "use client";
+import { LocalTime } from "@/components/shared/local-time";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -205,7 +206,7 @@ export function TaskDrawer({
                     <div className="min-w-0 flex-1">
                       <p className="text-[13px]">
                         <span className="font-medium">{c.authorName ?? "Former member"}</span>{" "}
-                        <span className="text-xs text-muted">{new Date(c.createdAt).toLocaleString()}</span>
+                        <span className="text-xs text-muted"><LocalTime value={c.createdAt} /></span>
                       </p>
                       <p className="mt-0.5 text-[13px] whitespace-pre-wrap break-words">{c.body}</p>
                     </div>

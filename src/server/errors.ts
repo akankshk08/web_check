@@ -47,3 +47,9 @@ export function isUniqueViolation(err: unknown): boolean {
   const e = err as { code?: string; cause?: { code?: string } } | null;
   return e?.code === "23505" || e?.cause?.code === "23505";
 }
+
+/** Postgres "invalid input syntax" (e.g. a malformed UUID in a URL) — treated as not found. */
+export function isInvalidIdError(err: unknown): boolean {
+  const e = err as { code?: string; cause?: { code?: string } } | null;
+  return e?.code === "22P02" || e?.cause?.code === "22P02";
+}

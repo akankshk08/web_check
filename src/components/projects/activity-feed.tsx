@@ -1,3 +1,4 @@
+import { LocalTime } from "@/components/shared/local-time";
 import { History } from "lucide-react";
 import { EmptyState } from "@/components/shared/page";
 
@@ -10,7 +11,7 @@ export function ActivityFeed({ rows }: { rows: { id: string; summary: string; cr
           <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
           <div className="min-w-0 flex-1">
             <p className="text-[13px]">{a.summary}</p>
-            <p className="text-xs text-muted">{new Date(a.createdAt).toLocaleString()}</p>
+            <p className="text-xs text-muted"><LocalTime value={a.createdAt} /></p>
           </div>
         </li>
       ))}

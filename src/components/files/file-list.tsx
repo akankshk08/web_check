@@ -1,4 +1,5 @@
 "use client";
+import { LocalTime } from "@/components/shared/local-time";
 import { Download, FileText, Lock, Trash2, Users } from "lucide-react";
 import { ConfirmButton } from "@/components/shared/confirm-button";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +27,7 @@ export function FileList({ files, showVisibility = true, empty = "No files yet."
           <div className="min-w-0 flex-1">
             <p className="truncate text-[13px] font-medium">{f.fileName}</p>
             <p className="text-xs text-muted">
-              {formatBytes(f.sizeBytes)} · {new Date(f.createdAt).toLocaleDateString()}
+              {formatBytes(f.sizeBytes)} · <LocalTime value={f.createdAt} dateOnly />
               {f.uploadedByName ? ` · ${f.uploadedByName}` : ""}
             </p>
           </div>

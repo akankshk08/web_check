@@ -73,3 +73,5 @@ export default async function ProjectLayout({ children, params }: { children: Re
     </>
   );
 }
+
+export const metadata = { title: "Project" };

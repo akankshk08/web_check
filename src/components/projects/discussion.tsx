@@ -1,4 +1,5 @@
 "use client";
+import { LocalTime } from "@/components/shared/local-time";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -31,7 +32,7 @@ export function Discussion({ projectId, comments, isClient }: { projectId: strin
               <div className="min-w-0 flex-1">
                 <p className="flex flex-wrap items-center gap-2 text-[13px]">
                   <span className="font-medium">{c.authorName ?? "Former member"}</span>
-                  <span className="text-xs text-muted">{new Date(c.createdAt).toLocaleString()}</span>
+                  <span className="text-xs text-muted"><LocalTime value={c.createdAt} /></span>
                   {!isClient && c.visibility === "INTERNAL" && (
                     <span className="inline-flex items-center gap-1 rounded bg-warning-soft px-1.5 text-[11px] text-[#8a5a08]">
                       <Lock className="size-3" aria-hidden /> Internal
