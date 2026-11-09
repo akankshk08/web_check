@@ -10,39 +10,28 @@ AgencyOS needs a database and a login service before it can run. The simplest wa
 
 1. **Create a Supabase project** at supabase.com → *New project*. Choose a database password and keep it somewhere safe.
 2. **Allow sign-ups without email confirmation (for local testing):** Supabase → *Authentication* → *Sign In / Providers* → *Email* → turn **off** "Confirm email". Turn it back on before going live.
-3. **Create the settings file.** In the project folder, run:
+3. **Run the guided setup.** In the project folder:
 
    ```bash
    npm install
    ```
 
    ```bash
-   cp .env.example .env
+   npm run setup
    ```
 
-   (On Windows Command Prompt use `copy .env.example .env`.) Open `.env` in a text editor and fill in:
+   It asks you to paste four things from Supabase (it says exactly where to find each), writes the `.env` settings file for you, creates the database tables and checks everything:
 
-   | Setting | Where to find it in Supabase |
+   | It asks for | Where to find it in Supabase |
    |---|---|
-   | `NEXT_PUBLIC_SUPABASE_URL` | Project Settings → API → Project URL |
-   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Project Settings → API → `anon` `public` key |
-   | `SUPABASE_SERVICE_ROLE_KEY` | Project Settings → API → `service_role` key (keep secret) |
-   | `DATABASE_URL` | *Connect* button → Connection string → **Transaction pooler** (port 6543); replace `[YOUR-PASSWORD]` with your database password |
-   | `CRON_SECRET` | Any random text, at least 32 characters |
+   | Project URL | Project Settings → Data API → Project URL |
+   | anon key | Project Settings → API Keys → `anon` `public` key |
+   | service_role key | Same page → `service_role` key (click Reveal; keep secret) |
+   | Connection string | Green *Connect* button → **Transaction pooler** (then it asks for your database password) |
 
-4. **Check the setup.** This tells you in plain English if anything is missing:
+   You can re-check your setup at any time with `npm run doctor`.
 
-   ```bash
-   npm run doctor
-   ```
-
-5. **Create the database tables:**
-
-   ```bash
-   npm run db:migrate
-   ```
-
-6. **(Optional) Add sample data** with ready-made logins (password `Password123!`, e.g. `owner@northwind.test`):
+4. **(Optional) Add sample data** with ready-made logins (password `Password123!`, e.g. `owner@northwind.test`):
 
    ```bash
    SEED_ALLOW_REMOTE=true npm run db:seed
@@ -50,7 +39,7 @@ AgencyOS needs a database and a login service before it can run. The simplest wa
 
    Only do this on a test project, never on your real one.
 
-7. **Start the app:**
+5. **Start the app:**
 
    ```bash
    npm run dev
