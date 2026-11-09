@@ -222,7 +222,7 @@ npm run build && npm start
 npx playwright test --trace off
 ```
 
-They cover registration, client/project creation, inviting and onboarding an employee, invitation reuse, task assignment and status updates, the full milestone review cycle in the client portal, invoice totals/sending/payment/PDF, file upload and cross-agency download rejection, login rate limiting, and phone-width layout. If you use a pre-installed Chromium, set `PW_CHROMIUM_PATH`.
+Start the server with `SIGNUP_RATE_LIMIT_PER_HOUR=100` for test runs: the suite signs up more accounts than the production limit of 5 per hour allows. They cover registration, client/project creation, inviting and onboarding an employee, invitation reuse, task assignment and status updates, the full milestone review cycle in the client portal, invoice totals/sending/payment/PDF, file upload and cross-agency download rejection, login rate limiting, and phone-width layout. If you use a pre-installed Chromium, set `PW_CHROMIUM_PATH`.
 
 ## Deploying to production (Vercel + Supabase)
 

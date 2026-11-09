@@ -8,6 +8,7 @@ import { safeNextPath } from "@/lib/utils";
 import {
   acceptInviteSchema,
   acceptInviteSignupSchema,
+  createWorkspaceSchema,
   forgotPasswordSchema,
   loginSchema,
   registerSchema,
@@ -144,4 +145,16 @@ export const switchOrganizationAction = authedAction(z.object({ orgId: z.uuid() 
   if (!membership) throw new BadRequestError("Workspace not found.");
   await setActiveOrg(membership.orgId);
   return { redirectTo: homePathFor(membership.role) };
+});
+
+/** A signed-in user without a workspace (or wanting another one) creates an agency workspace. */
+export const createWorkspaceAction = publicAction(createWorkspaceSchema, async (input) => {
+  const user = await getSessionUser();
+  if (!user?.email) throw new UnauthenticatedError();
+  const db = getDb();
+  await enforceRateLimit(db, `workspace:${user.id}`, RATE_LIMITS.register.limit, RATE_LIMITS.register.window);
+  const fullName = (user.user_metadata?.full_name as string | undefined) ?? user.email.split("@")[0]!;
+  const org = await createAgencyForUser(db, { userId: user.id, email: user.email, fullName, agencyName: input.agencyName });
+  await setActiveOrg(org.id);
+  return { redirectTo: "/app" };
 });

@@ -21,7 +21,8 @@ export async function enforceRateLimit(db: DbOrTx, key: string, limit: number, w
 
 export const RATE_LIMITS = {
   login: { limit: 10, window: 15 * 60 },
-  register: { limit: 5, window: 60 * 60 },
+  // Sign-ups per IP per hour. Override only for automated test runs (SIGNUP_RATE_LIMIT_PER_HOUR).
+  register: { limit: Number(process.env.SIGNUP_RATE_LIMIT_PER_HOUR) || 5, window: 60 * 60 },
   passwordReset: { limit: 5, window: 60 * 60 },
   invite: { limit: 30, window: 60 * 60 },
   upload: { limit: 60, window: 10 * 60 },

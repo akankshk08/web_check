@@ -29,3 +29,5 @@ export const acceptInviteSchema = z.object({ token: z.string().min(20).max(200) 
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
+
+export const createWorkspaceSchema = z.object({ agencyName: requiredText("Agency name", 120) }).strict();

@@ -12,6 +12,10 @@ export async function proxy(request: NextRequest) {
   const { response, userId } = await updateSession(request);
   const { pathname, search } = request.nextUrl;
 
+  // Only redirect page navigations. Form submissions (server actions are POSTs) must reach
+  // their handler, which does its own auth check — redirecting them breaks the response.
+  if (request.method !== "GET" && request.method !== "HEAD") return response;
+
   if (!userId && PROTECTED_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
