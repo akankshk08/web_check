@@ -25,6 +25,11 @@ const ask = async (q, check) => {
 };
 const run = (cmd) => spawnSync(cmd, { stdio: "inherit", shell: true }).status === 0;
 
+if (!existsSync("node_modules/.bin/tsx") && !existsSync("node_modules/tsx")) {
+  console.log("\n❌ The project's packages aren't installed yet.\n   Run  npm install  first, then  npm run setup  again.\n");
+  process.exit(1);
+}
+
 console.log(`
 AgencyOS setup
 ==============
@@ -76,7 +81,7 @@ console.log("\n✅ Saved your settings to .env\n");
 
 console.log("Creating the database tables…");
 if (!run("npm run db:migrate")) {
-  console.log("\n❌ Creating the tables failed. Check the connection string and password, then run  npm run setup  again.");
+  console.log("\n❌ Creating the tables failed. Read the error above:\n   - 'password authentication failed' or 'ENOTFOUND' → re-run  npm run setup  and re-check the connection string and password\n   - anything else → send the error to whoever is helping you.\n   Your settings are saved, so after fixing you can also just run  npm run db:migrate");
   process.exit(1);
 }
 console.log("\nChecking everything…");
