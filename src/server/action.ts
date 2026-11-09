@@ -5,10 +5,9 @@ import { requireAuth } from "@/server/auth/session";
 import type { AuthContext } from "@/server/auth/types";
 import { AppError, isUniqueViolation } from "@/server/errors";
 
-export type FieldErrors = Record<string, string[] | undefined>;
-export type ActionResult<T = null> =
-  | { ok: true; data: T; message?: string }
-  | { ok: false; error: string; fieldErrors?: FieldErrors };
+import type { ActionResult, FieldErrors } from "@/lib/action-result";
+
+export type { ActionResult, FieldErrors };
 
 /** Converts any thrown error into a safe, user-facing result. Internal details are only logged. */
 export function toActionError(err: unknown): { ok: false; error: string; fieldErrors?: FieldErrors } {
