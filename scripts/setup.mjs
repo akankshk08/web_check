@@ -25,7 +25,7 @@ const ask = async (q, check) => {
 };
 const run = (cmd) => spawnSync(cmd, { stdio: "inherit", shell: true }).status === 0;
 
-if (!existsSync("node_modules/.bin/tsx") && !existsSync("node_modules/tsx")) {
+if (!existsSync("node_modules/next") || !existsSync("node_modules/drizzle-orm")) {
   console.log("\n❌ The project's packages aren't installed yet.\n   Run  npm install  first, then  npm run setup  again.\n");
   process.exit(1);
 }
