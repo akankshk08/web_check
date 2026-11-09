@@ -4,6 +4,62 @@
 
 AgencyOS is a multi-tenant SaaS for digital agencies, web studios and software companies. Each agency gets a private workspace to run clients, projects, tasks, milestone approvals, files, invoices and website maintenance — with a separate portal for its clients.
 
+## Quick start (easiest way to run it on your computer)
+
+AgencyOS needs a database and a login service before it can run. The simplest way is a free Supabase project, which provides both. You only need Node.js 22 (from [nodejs.org](https://nodejs.org)) and a free [supabase.com](https://supabase.com) account.
+
+1. **Create a Supabase project** at supabase.com → *New project*. Choose a database password and keep it somewhere safe.
+2. **Allow sign-ups without email confirmation (for local testing):** Supabase → *Authentication* → *Sign In / Providers* → *Email* → turn **off** "Confirm email". Turn it back on before going live.
+3. **Create the settings file.** In the project folder, run:
+
+   ```bash
+   npm install
+   ```
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   (On Windows Command Prompt use `copy .env.example .env`.) Open `.env` in a text editor and fill in:
+
+   | Setting | Where to find it in Supabase |
+   |---|---|
+   | `NEXT_PUBLIC_SUPABASE_URL` | Project Settings → API → Project URL |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Project Settings → API → `anon` `public` key |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Project Settings → API → `service_role` key (keep secret) |
+   | `DATABASE_URL` | *Connect* button → Connection string → **Transaction pooler** (port 6543); replace `[YOUR-PASSWORD]` with your database password |
+   | `CRON_SECRET` | Any random text, at least 32 characters |
+
+4. **Check the setup.** This tells you in plain English if anything is missing:
+
+   ```bash
+   npm run doctor
+   ```
+
+5. **Create the database tables:**
+
+   ```bash
+   npm run db:migrate
+   ```
+
+6. **(Optional) Add sample data** with ready-made logins (password `Password123!`, e.g. `owner@northwind.test`):
+
+   ```bash
+   SEED_ALLOW_REMOTE=true npm run db:seed
+   ```
+
+   Only do this on a test project, never on your real one.
+
+7. **Start the app:**
+
+   ```bash
+   npm run dev
+   ```
+
+   Open http://localhost:3000 and click **Start free** to create your agency. Leave the terminal open while you use the app.
+
+File uploads also need a **private** storage bucket called `attachments` (Supabase → *Storage* → *New bucket*, leave "Public" off).
+
 ## Contents
 
 - [What's included](#whats-included)
