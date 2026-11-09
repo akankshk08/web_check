@@ -6,7 +6,7 @@ import { getDb } from "@/db";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { ForbiddenError, UnauthenticatedError } from "@/server/errors";
 import { loadAuthContext } from "./load-context";
-import { homePathFor, isClient, isManager, isStaff } from "./permissions";
+import { canManageFinance, homePathFor, isClient, isManager, isStaff } from "./permissions";
 import type { AuthContext } from "./types";
 
 export const ACTIVE_ORG_COOKIE = "aos_org";
@@ -60,5 +60,11 @@ export async function requireAuth(): Promise<AuthContext> {
   const ctx = await getAuthContext();
   if (!ctx) throw new UnauthenticatedError();
   if (!ctx.orgId) throw new ForbiddenError("You are not a member of any workspace.");
+  return ctx;
+}
+
+export async function requireFinancePage(): Promise<AuthContext> {
+  const ctx = await requirePageAuth();
+  if (!canManageFinance(ctx)) redirect(homePathFor(ctx.role));
   return ctx;
 }

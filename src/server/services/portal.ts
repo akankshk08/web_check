@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 import type { DbOrTx } from "@/db";
-import { attachments, invoices, milestones, projects } from "@/db/schema";
+import { attachments, clientMembers, invoices, milestones, projects } from "@/db/schema";
 import { assertClient } from "@/server/auth/permissions";
 import type { AuthContext } from "@/server/auth/types";
 import { effectiveInvoiceStatus } from "./invoices";
@@ -90,4 +90,15 @@ export async function getPortalDashboard(db: DbOrTx, ctx: AuthContext) {
     recentDeliverables: deliverables,
     outstandingInvoices: invoiceRows.map((i) => ({ ...i, status: effectiveInvoiceStatus(i) })),
   };
+}
+
+/** Whether the signed-in client user may approve milestones for this client account. */
+export async function canApproveForClient(db: DbOrTx, ctx: AuthContext, clientId: string) {
+  if (!ctx.clientIds.includes(clientId)) return false;
+  const [row] = await db
+    .select({ canApprove: clientMembers.canApprove })
+    .from(clientMembers)
+    .where(and(eq(clientMembers.clientId, clientId), eq(clientMembers.userId, ctx.userId)))
+    .limit(1);
+  return !!row?.canApprove;
 }
