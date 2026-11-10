@@ -3,6 +3,7 @@ import { unstable_rethrow } from "next/navigation";
 import { z } from "zod";
 import { requireAuth } from "@/server/auth/session";
 import type { AuthContext } from "@/server/auth/types";
+import { log } from "@/server/log";
 import { AppError, isInvalidIdError, isUniqueViolation } from "@/server/errors";
 
 import type { ActionResult, FieldErrors } from "@/lib/action-result";
@@ -19,7 +20,7 @@ export function toActionError(err: unknown): { ok: false; error: string; fieldEr
   if (isUniqueViolation(err)) return { ok: false, error: "That record already exists." };
   if (isInvalidIdError(err)) return { ok: false, error: "Not found." };
   const ref = crypto.randomUUID().slice(0, 8);
-  console.error(`[action-error ${ref}]`, err);
+  log.error("action_failed", { ref, error: err, cause: (err as { cause?: unknown })?.cause });
   return { ok: false, error: `Something went wrong. Please try again. (ref ${ref})` };
 }
 

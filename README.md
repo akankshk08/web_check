@@ -66,7 +66,9 @@ File uploads also need a **private** storage bucket called `attachments` (Supaba
 | Area | Features |
 |---|---|
 | Marketing site | `/`, `/features`, `/pricing`, `/about`, `/contact` (contact form sends via Resend when configured) |
-| Auth | Register an agency, sign in, forgot/reset password, email confirmation, invitation links (`/invite/[token]`), workspace switcher for people in several agencies |
+| Auth & account | Register an agency, sign in, forgot/reset password (signs out other devices), email confirmation with "resend", change password, delete account (re-enter password; a sole owner's workspace is deleted with it), invitation links (`/invite/[token]`), workspace switcher |
+| Legal & SEO | Privacy Policy and Terms (edit `src/lib/legal.ts` and have them reviewed by a lawyer), linked in the footer and at sign-up; `robots.txt`, `sitemap.xml`, link-preview image |
+| Analytics & logs | Cookieless Vercel Analytics; structured JSON server logs with secrets redacted; every unhandled server error logged via `src/instrumentation.ts` |
 | Agency dashboard | Active/completed projects, pending/overdue tasks, pending approvals, clients; charts for project status, monthly completions and revenue; recent activity, upcoming deadlines, recent projects, team workload — all from the database |
 | Clients | Create, edit, archive/restore, search, filter, detail page with projects, invoices, support tickets, portal users and invitations; duplicate emails blocked |
 | Projects | Create/edit/archive, team assignment, budget, dates, priority, status, automatic progress from tasks, search/sort/filter, discussion (internal or shared with the client), activity feed |
@@ -130,6 +132,7 @@ What can fail and how it's handled: invalid input → field errors on the form; 
 - **Headers**: CSP, HSTS, `X-Frame-Options: DENY`, `nosniff`, Referrer-Policy, Permissions-Policy (see `next.config.ts`).
 - **Secrets**: the service-role key, database URL, Resend key and cron secret are server-only (`server-only` imports, validated by Zod at first use). Only the Supabase URL and anon key reach the browser.
 - **Passwords** are handled entirely by Supabase Auth; the `users` table stores no password data.
+- **Session cookies** are `httpOnly` (page scripts can't read them), `SameSite=Lax`, and `Secure` in production.
 
 ## Local development
 
@@ -283,6 +286,13 @@ tests/                    Vitest unit + integration tests
 e2e/                      Playwright end-to-end tests
 scripts/local-supabase/   dev/test-only local Auth + Storage emulation
 ```
+
+## Before launch checklist
+
+1. Edit `src/lib/legal.ts` (company name, contact email, governing law) and have the Privacy Policy and Terms reviewed by a lawyer. They are starting templates, not legal advice.
+2. Supabase → Authentication → turn **Confirm email** back on, and set up custom SMTP with your Resend domain so confirmation/reset emails come from your domain.
+3. Turn on Supabase backups / Point-in-Time Recovery and note how to restore.
+4. Optional: add Sentry (or another error tracker); `src/instrumentation.ts` is the place to forward errors.
 
 ## Known limitations
 

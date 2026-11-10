@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { AUTH_COOKIE_OPTIONS } from "./cookie-options";
 import { NextResponse, type NextRequest } from "next/server";
 
 /** Refreshes the Supabase session cookie and returns the signed-in user id (if any). */
@@ -9,6 +10,7 @@ export async function updateSession(request: NextRequest) {
   if (!url || !key) return { response, userId: null as string | null };
 
   const supabase = createServerClient(url, key, {
+    cookieOptions: AUTH_COOKIE_OPTIONS,
     cookies: {
       getAll() {
         return request.cookies.getAll();

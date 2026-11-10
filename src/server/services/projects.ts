@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, ilike, inArray, isNotNull, isNull, notInArray, sql, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, inArray, isNotNull, isNull, sql, type SQL } from "drizzle-orm";
 import type { z } from "zod";
 import type { Database, DbOrTx } from "@/db";
 import { clients, organizationMembers, projectMembers, projects, tasks, users } from "@/db/schema";
@@ -306,6 +306,3 @@ export async function listProjectOptions(db: DbOrTx, ctx: AuthContext, { clientI
     .orderBy(projects.name)
     .limit(500);
 }
-
-export const ACTIVE_PROJECT_STATUSES: ProjectStatus[] = ["PLANNING", "ACTIVE", "ON_HOLD", "IN_REVIEW"];
-export const notDone = notInArray(projects.status, ["COMPLETED", "CANCELLED"]);

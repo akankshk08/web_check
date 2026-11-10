@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { eq } from "drizzle-orm";
 import { OrganizationForm, ProfileForm, TransferOwnershipForm } from "@/components/settings/settings-forms";
+import { AccountCards } from "@/components/settings/account-cards";
 import { PageHeader } from "@/components/shared/page";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDb } from "@/db";
@@ -56,6 +57,7 @@ export default async function SettingsPage() {
           </CardContent>
         </Card>
       )}
+      <AccountCards isOwner={isOwner(ctx)} />
       {isOwner(ctx) && (
         <Card className="border-danger/30">
           <CardHeader>

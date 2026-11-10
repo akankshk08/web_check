@@ -5,8 +5,8 @@ import { LoginForm } from "@/components/auth/forms";
 
 export const metadata: Metadata = { title: "Sign in" };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {
-  const { next, error } = await searchParams;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string; deleted?: string }> }) {
+  const { next, error, deleted } = await searchParams;
   return (
     <AuthCard
       title="Sign in to AgencyOS"
@@ -20,6 +20,11 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </>
       }
     >
+      {deleted === "1" && (
+        <p className="mb-4 rounded-md bg-success-soft p-3 text-[13px] text-success" role="status">
+          Your account has been deleted.
+        </p>
+      )}
       {error === "link" && (
         <p className="mb-4 rounded-md bg-warning-soft p-3 text-[13px] text-[#8a5a08]" role="alert">
           That link is invalid or has expired. Please sign in or request a new link.

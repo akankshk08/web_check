@@ -40,7 +40,7 @@ export const invoices = pgTable(
       name: "invoices_client_fk",
       columns: [t.organizationId, t.clientId],
       foreignColumns: [clients.organizationId, clients.id],
-    }).onDelete("restrict"),
+    }),
     foreignKey({
       name: "invoices_project_fk",
       columns: [t.organizationId, t.projectId],

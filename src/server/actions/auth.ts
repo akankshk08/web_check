@@ -99,6 +99,8 @@ export const resetPasswordAction = publicAction(resetPasswordSchema, async (inpu
     if (error.code === "same_password") throw new BadRequestError("Choose a password you haven't used before.");
     throw new BadRequestError("We couldn't update your password. Please request a new link.");
   }
+  // Anyone signed in elsewhere with the old password is signed out.
+  await supabase.auth.signOut({ scope: "others" });
   return { redirectTo: "/app" };
 });
 

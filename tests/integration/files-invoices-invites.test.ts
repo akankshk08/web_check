@@ -204,3 +204,39 @@ describe("Support tickets", () => {
     await updateTicket(db, A.adminCtx, { id: t.id, status: "RESOLVED", staffResponse: "Fixed" });
   });
 });
+
+describe("Delete account", () => {
+  it("blocks an owner whose workspace still has team members", async () => {
+    const { deleteAccountData } = await import("@/server/services/account");
+    await expect(deleteAccountData(db, A.owner.id)).rejects.toThrow(/Transfer ownership/);
+  });
+
+  it("removes an employee's personal data but keeps the agency's work", async () => {
+    const { deleteAccountData } = await import("@/server/services/account");
+    const { users, organizationMembers, projects } = await import("@/db/schema");
+    await deleteAccountData(db, A.outsider.user.id);
+    expect(await db.select().from(users).where(eq(users.id, A.outsider.user.id))).toHaveLength(0);
+    expect(await db.select().from(organizationMembers).where(eq(organizationMembers.userId, A.outsider.user.id))).toHaveLength(0);
+    expect((await db.select().from(projects).where(eq(projects.organizationId, A.org.id))).length).toBeGreaterThan(0);
+  });
+
+  it("deletes a sole owner's whole workspace and returns its files for removal", async () => {
+    const { deleteAccountData } = await import("@/server/services/account");
+    const { organizations, clients, invoices, attachments } = await import("@/db/schema");
+    const { createAgency } = await import("../helpers/db");
+    const { makeClient, makeProject } = await import("../helpers/fixtures");
+    const solo = await createAgency("Solo Studio");
+    const ctx = await ctxFor(solo.owner.id);
+    const client = await makeClient(ctx, "Solo Client");
+    const project = await makeProject(ctx, client.id);
+    await createInvoice(db, ctx, { clientId: client.id, projectId: project.id, issueDate: "2026-11-01", dueDate: "2026-11-30", taxRate: "0", notes: "", items: [{ description: "x", quantity: "1", unitPrice: "10" }] });
+    const req = await requestUpload(db, storage, ctx, { projectId: project.id, taskId: "", milestoneId: "", fileName: "a.pdf", mimeType: "application/pdf", sizeBytes: 5, shareWithClient: false, isDeliverable: false });
+    const res = await deleteAccountData(db, solo.owner.id);
+    expect(res.deletedOrgs).toEqual([solo.org.id]);
+    expect(res.storagePaths).toEqual([req.path]);
+    expect(await db.select().from(organizations).where(eq(organizations.id, solo.org.id))).toHaveLength(0);
+    expect(await db.select().from(clients).where(eq(clients.organizationId, solo.org.id))).toHaveLength(0);
+    expect(await db.select().from(invoices).where(eq(invoices.organizationId, solo.org.id))).toHaveLength(0);
+    expect(await db.select().from(attachments).where(eq(attachments.organizationId, solo.org.id))).toHaveLength(0);
+  });
+});

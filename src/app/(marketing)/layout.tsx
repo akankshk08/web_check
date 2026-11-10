@@ -54,6 +54,12 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
                 {n.label}
               </Link>
             ))}
+            <Link href="/privacy" className="hover:text-foreground">
+              Privacy
+            </Link>
+            <Link href="/terms" className="hover:text-foreground">
+              Terms
+            </Link>
             <Link href="/login" className="hover:text-foreground">
               Sign in
             </Link>

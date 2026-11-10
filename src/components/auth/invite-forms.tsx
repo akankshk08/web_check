@@ -61,6 +61,17 @@ export function InviteSignupForm({ token, email }: { token: string; email: strin
       <Button type="submit" loading={form.formState.isSubmitting}>
         Create account & join
       </Button>
+      <p className="text-center text-xs text-muted">
+        By joining you agree to the{" "}
+        <a href="/terms" className="text-primary hover:underline">
+          Terms
+        </a>{" "}
+        and{" "}
+        <a href="/privacy" className="text-primary hover:underline">
+          Privacy Policy
+        </a>
+        .
+      </p>
     </form>
   );
 }

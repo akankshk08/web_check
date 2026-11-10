@@ -43,7 +43,7 @@ export const projects = pgTable(
       name: "projects_client_fk",
       columns: [t.organizationId, t.clientId],
       foreignColumns: [clients.organizationId, clients.id],
-    }).onDelete("restrict"),
+    }),
     index("projects_org_status_idx").on(t.organizationId, t.status),
     index("projects_client_idx").on(t.clientId),
     index("projects_org_due_idx").on(t.organizationId, t.dueDate),
