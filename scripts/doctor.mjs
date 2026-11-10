@@ -57,8 +57,25 @@ if (env.DATABASE_URL && existsSync("node_modules/postgres")) {
     await sql`select 1`;
     ok("Database connection works");
     const [row] = await sql`select to_regclass('public.organizations') as t`;
-    if (row?.t) ok("Database tables exist (migrations applied)");
-    else bad("Database tables are missing", "Run:  npm run db:migrate");
+    if (row?.t) {
+      ok("Database tables exist (migrations applied)");
+      // A tiny write must finish quickly; if it doesn't, something is holding a lock.
+      try {
+        await sql.begin(async (tx) => {
+          await tx`set local statement_timeout = 5000`;
+          await tx`insert into rate_limits (key, window_start, count) values ('doctor-check', now(), 1)
+                   on conflict (key) do update set count = rate_limits.count + 1`;
+        });
+        ok("Database responds quickly");
+      } catch (e) {
+        if (e.code === "57014") {
+          bad(
+            "The database is stuck: a tiny write took more than 5 seconds",
+            "Something left over from an earlier crash is blocking it.\nIn Supabase: Project Settings → General → Restart project. Wait 2–3 minutes, then run  npm run doctor  again.",
+          );
+        } else throw e;
+      }
+    } else bad("Database tables are missing", "Run:  npm run db:migrate");
   } catch (e) {
     bad(`Can't connect to the database (${e.code ?? e.message})`, "Check DATABASE_URL in .env — especially the password, and that the database is running.");
   } finally {

@@ -29,6 +29,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Never print server action arguments (they include passwords) in the dev terminal.
+  logging: { serverFunctions: false },
   serverExternalPackages: ["@react-pdf/renderer"],
   experimental: {
     serverActions: { bodySizeLimit: "1mb" },
